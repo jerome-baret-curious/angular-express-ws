@@ -1,0 +1,32 @@
+{
+  "monsters": [
+    {
+      "id": 1,
+      "name": "Cerberus"
+    },
+    {
+      "id": 2,
+      "name": "Minotaur"
+    },
+    {
+      "id": 3,
+      "name": "Medusa"
+    },
+    {
+      "id": 4,
+      "name": "Hydra"
+    },
+    {
+      "id": 5,
+      "name": "Sphinx"
+    },
+    {
+      "id": 6,
+      "name": "Siren"
+    },
+    {
+      "id": 7,
+      "name": "Lamia"
+    }
+  ]
+}

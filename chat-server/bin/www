@@ -1,0 +1,148 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+import app from '../app.js';
+import debugModule from 'debug';
+import https from 'https';
+import fs from 'node:fs';
+import {WebSocketServer} from 'ws';
+
+const debug = debugModule('chat:server');
+/**
+ * Get port from environment and store in Express.
+ */
+
+const port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+const options = {
+    key: fs.readFileSync('localhost-key.pem'),
+    cert: fs.readFileSync('localhost.pem'),
+};
+
+/**
+ * Create HTTP server.
+ */
+
+const server = https.createServer(options, app);
+
+// Initialize WebSocket server
+const wss = new WebSocketServer({noServer: true});
+
+function heartbeat() {
+    this.isAlive = true;
+}
+
+// Configure WebSocket communication
+wss.on('connection', function connection(ws) {
+    ws.isAlive = true;
+    ws.on('pong', heartbeat);
+    const interval = setInterval(function ping() {
+        wss.clients.forEach(function each(ws) {
+            if (ws.isAlive === false) return ws.terminate();
+            ws.isAlive = false;
+            ws.ping();
+        });
+    }, 30000);
+
+    ws.on('error', console.error);
+
+    ws.on('message', function message(data) {
+        console.log('received: %s', data);
+        wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN && data !== undefined) {
+                client.send(data.toString());
+            }
+        });
+    });
+
+    ws.on('close', function close() {
+        clearInterval(interval);
+        console.log('disconnected');
+    });
+
+    ws.on('open', function open() {
+        console.log('connected');
+    });
+});
+
+/**
+ * Upgrade HTTP server to WebSocket server.
+ */
+
+server.on('upgrade', function upgrade(request, socket, head) {
+    wss.handleUpgrade(request, socket, head, function done(ws) {
+        wss.emit('connection', ws, request);
+    });
+});
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+    const port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
+
+    if (port >= 0) {
+        // port number
+        return port;
+    }
+
+    return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+
+    const bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+    const addr = server.address();
+    const bind = typeof addr === 'string'
+        ? 'pipe ' + addr
+        : 'port ' + addr.port;
+    debug('Listening on ' + bind);
+}

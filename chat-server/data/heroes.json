@@ -1,0 +1,32 @@
+{
+  "heroes": [
+    {
+      "id": 1,
+      "name": "Heracles"
+    },
+    {
+      "id": 2,
+      "name": "Amphitryon"
+    },
+    {
+      "id": 3,
+      "name": "Ajax"
+    },
+    {
+      "id": 4,
+      "name": "Ganymede"
+    },
+    {
+      "id": 5,
+      "name": "Perseus"
+    },
+    {
+      "id": 6,
+      "name": "Jason"
+    },
+    {
+      "id": 7,
+      "name": "Orpheus"
+    }
+  ]
+}

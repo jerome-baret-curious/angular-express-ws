@@ -1,0 +1,7 @@
+<div>You are {{character()?.name ?? 'Character loading'}}</div>
+<label for="messageInput">Chat</label>
+<input #msgInput type="text" id="messageInput" />
+@for (msg of messages(); track msg) {
+    <div>{{msg}}</div>
+}
+<button (click)="send(msgInput.value)">Send</button>

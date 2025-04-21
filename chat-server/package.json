@@ -1,0 +1,17 @@
+{
+  "name": "chat-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "debug": "~4.4.0",
+    "express": "~5.1.0",
+    "http-errors": "~2.0.0",
+    "morgan": "~1.10.0",
+    "ws": "^8.18.1"
+  }
+}
